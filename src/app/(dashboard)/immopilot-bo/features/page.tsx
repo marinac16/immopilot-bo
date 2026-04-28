@@ -1,6 +1,7 @@
 import { getUsers } from "@/lib/api/users";
 import { getAllFeatures, getUserFeatures } from "@/lib/api/features";
 import { Header } from "@/components/layout/Header";
+import { UserSelector } from "@/components/layout/UserSelector";
 import { FeatureToggle } from "./FeatureToggle";
 
 interface Props {
@@ -33,7 +34,8 @@ export default async function FeaturesPage({ searchParams }: Props) {
     <div>
       <Header
         title="Features"
-        description={`${selectedUser.firstname} ${selectedUser.lastname} — ${enabledCount}/${allFeatures.length} active(s)`}
+        description={`${enabledCount}/${allFeatures.length} active(s)`}
+        actions={<UserSelector users={users} selectedUserId={selectedUser.id} />}
       />
 
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden max-w-lg">

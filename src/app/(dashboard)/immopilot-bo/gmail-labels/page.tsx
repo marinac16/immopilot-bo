@@ -1,6 +1,7 @@
 import { getUsers } from "@/lib/api/users";
 import { getGmailLabels } from "@/lib/api/gmail-labels";
 import { Header } from "@/components/layout/Header";
+import { UserSelector } from "@/components/layout/UserSelector";
 import { Badge } from "@/components/ui/badge";
 
 interface Props {
@@ -27,7 +28,8 @@ export default async function GmailLabelsPage({ searchParams }: Props) {
     <div>
       <Header
         title="Labels Gmail"
-        description={`${selectedUser.firstname} ${selectedUser.lastname} — ${labels.length} label(s)`}
+        description={`${labels.length} label(s)`}
+        actions={<UserSelector users={users} selectedUserId={selectedUser.id} />}
       />
 
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">

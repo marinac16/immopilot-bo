@@ -1,6 +1,7 @@
 import { getUsers } from "@/lib/api/users";
 import { getBranding } from "@/lib/api/branding";
 import { Header } from "@/components/layout/Header";
+import { UserSelector } from "@/components/layout/UserSelector";
 import { BrandingForm } from "@/components/forms/BrandingForm";
 import { updateBrandingAction } from "./actions";
 
@@ -29,7 +30,7 @@ export default async function BrandingPage({ searchParams }: Props) {
     <div>
       <Header
         title="Branding"
-        description={`${selectedUser.firstname} ${selectedUser.lastname}`}
+        actions={<UserSelector users={users} selectedUserId={selectedUser.id} />}
       />
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 max-w-lg">
         <BrandingForm action={boundAction} defaultValues={branding} />

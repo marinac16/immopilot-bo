@@ -1,6 +1,7 @@
 import { getUsers } from "@/lib/api/users";
 import { getNotionConfig } from "@/lib/api/notion";
 import { Header } from "@/components/layout/Header";
+import { UserSelector } from "@/components/layout/UserSelector";
 import { NotionForm } from "@/components/forms/NotionForm";
 import { updateNotionAction } from "./actions";
 
@@ -29,7 +30,7 @@ export default async function NotionPage({ searchParams }: Props) {
     <div>
       <Header
         title="Notion"
-        description={`${selectedUser.firstname} ${selectedUser.lastname}`}
+        actions={<UserSelector users={users} selectedUserId={selectedUser.id} />}
       />
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 max-w-lg">
         <NotionForm action={boundAction} defaultValues={config} />
