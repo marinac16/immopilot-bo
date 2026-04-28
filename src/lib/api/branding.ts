@@ -1,4 +1,4 @@
-import { apiRequest } from "./client";
+import { apiRequest, zparse } from "./client";
 import {
   BrandingSchema,
   type Branding,
@@ -7,7 +7,7 @@ import {
 
 export async function getBranding(userId: string): Promise<Branding> {
   const data = await apiRequest<unknown>(`/branding-config/${userId}`);
-  return BrandingSchema.parse(data);
+  return zparse(BrandingSchema, data);
 }
 
 export async function upsertBranding(userId: string, input: UpdateBrandingInput): Promise<Branding> {
@@ -15,5 +15,5 @@ export async function upsertBranding(userId: string, input: UpdateBrandingInput)
     method: "POST",
     body: input,
   });
-  return BrandingSchema.parse(data);
+  return zparse(BrandingSchema, data);
 }

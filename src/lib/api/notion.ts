@@ -1,4 +1,4 @@
-import { apiRequest } from "./client";
+import { apiRequest, zparse } from "./client";
 import {
   NotionConfigSchema,
   type NotionConfig,
@@ -7,7 +7,7 @@ import {
 
 export async function getNotionConfig(userId: string): Promise<NotionConfig> {
   const data = await apiRequest<unknown>(`/notion-config/${userId}`);
-  return NotionConfigSchema.parse(data);
+  return zparse(NotionConfigSchema, data);
 }
 
 export async function upsertNotionConfig(
@@ -18,5 +18,5 @@ export async function upsertNotionConfig(
     method: "PATCH",
     body: input,
   });
-  return NotionConfigSchema.parse(data);
+  return zparse(NotionConfigSchema, data);
 }

@@ -1,4 +1,4 @@
-import { apiRequest } from "./client";
+import { apiRequest, zparse } from "./client";
 import { GmailLabelListSchema, type GmailLabel } from "@/lib/schemas/gmail-label.schema";
 
 export async function getGmailLabels(userId: string): Promise<GmailLabel[]> {
@@ -6,5 +6,5 @@ export async function getGmailLabels(userId: string): Promise<GmailLabel[]> {
     method: "POST",
     body: { userId },
   });
-  return GmailLabelListSchema.parse(data);
+  return zparse(GmailLabelListSchema, data);
 }

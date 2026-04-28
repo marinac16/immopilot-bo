@@ -1,3 +1,5 @@
+import type { ZodType } from "zod";
+
 const BASE_URL = process.env.API_URL;
 const API_KEY = process.env.API_KEY;
 
@@ -15,8 +17,18 @@ export class ApiError extends Error {
     message: string
   ) {
     super(message);
+    Object.setPrototypeOf(this, new.target.prototype);
     this.name = "ApiError";
   }
+}
+
+export function zparse<T>(schema: ZodType<T>, data: unknown): T {
+  const result = schema.safeParse(data);
+  if (!result.success) {
+    const msg = result.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join("; ");
+    throw new Error(`API response mismatch: ${msg}`);
+  }
+  return result.data;
 }
 
 type ApiEnvelope<T> = { success: true; data: T } | { success: false; error: string };
@@ -45,7 +57,12 @@ export async function apiRequest<T>(
 
   if (res.status === 204) return undefined as T;
 
-  const json = (await res.json()) as ApiEnvelope<T>;
+  let json: ApiEnvelope<T>;
+  try {
+    json = (await res.json()) as ApiEnvelope<T>;
+  } catch {
+    throw new ApiError(res.status, `Non-JSON response from API (${res.status} ${res.statusText})`);
+  }
 
   if (!res.ok || !json.success) {
     const msg = "error" in json ? json.error : res.statusText;

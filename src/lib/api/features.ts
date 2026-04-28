@@ -1,4 +1,4 @@
-import { apiRequest } from "./client";
+import { apiRequest, zparse } from "./client";
 import {
   FeatureListSchema,
   UserFeatureListSchema,
@@ -8,12 +8,12 @@ import {
 
 export async function getAllFeatures(): Promise<Feature[]> {
   const data = await apiRequest<unknown>("/features");
-  return FeatureListSchema.parse(data);
+  return zparse(FeatureListSchema, data);
 }
 
 export async function getUserFeatures(userId: string): Promise<UserFeature[]> {
   const data = await apiRequest<unknown>(`/user/${userId}/features`);
-  return UserFeatureListSchema.parse(data);
+  return zparse(UserFeatureListSchema, data);
 }
 
 export async function assignFeature(userId: string, featureId: string): Promise<UserFeature> {
@@ -21,7 +21,7 @@ export async function assignFeature(userId: string, featureId: string): Promise<
     method: "POST",
     body: { featureId },
   });
-  return UserFeatureListSchema.element.parse(data);
+  return zparse(UserFeatureListSchema.element, data);
 }
 
 export async function toggleFeature(
@@ -33,7 +33,7 @@ export async function toggleFeature(
     method: "PATCH",
     body: { enabled },
   });
-  return UserFeatureListSchema.element.parse(data);
+  return zparse(UserFeatureListSchema.element, data);
 }
 
 export async function removeFeature(userId: string, featureId: string): Promise<void> {
