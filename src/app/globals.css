@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --radius: 0.5rem;
+    --color-navy: #1c293c;
+    --color-emerald: #007a55;
+    --color-emerald-light: #00a876;
+    --color-navy-light: #2d4258;
+    --color-muted: #8b9ab0;
+  }
+
+  body {
+    @apply bg-background text-navy;
+  }
+}
