@@ -3,19 +3,33 @@ import { Header } from "@/components/layout/Header";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { UserForm } from "@/components/forms/UserForm";
+import { UserTabs, isValidTab, type UserTabId } from "./UserTabs";
+import { NotionConfigSection } from "./NotionConfigSection";
+import { BrandingSection } from "./BrandingSection";
+import { FeaturesSection } from "./FeaturesSection";
+import { GmailLabelsSection } from "./GmailLabelsSection";
+import { DeleteUserDialog } from "./DeleteUserDialog";
 import { updateUserAction, deleteUserAction } from "./actions";
 import Link from "next/link";
 
 interface Props {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ tab?: string }>;
 }
 
-export default async function UserDetailPage({ params }: Props) {
+export default async function UserDetailPage({ params, searchParams }: Props) {
   const { id } = await params;
+  const { tab } = await searchParams;
+
   const [user, oauthStatus] = await Promise.all([
     getUser(id),
     getOAuthStatus(id).catch(() => null),
   ]);
+
+  const isNotionUser = user.crmType === "notion";
+  const requestedTab: UserTabId = isValidTab(tab) ? tab : "informations";
+  const activeTab: UserTabId =
+    requestedTab === "notion" && !isNotionUser ? "informations" : requestedTab;
 
   const boundUpdate = updateUserAction.bind(null, id);
   const boundDelete = deleteUserAction.bind(null, id);
@@ -23,7 +37,7 @@ export default async function UserDetailPage({ params }: Props) {
   return (
     <div>
       <Header
-        title={`${user.firstname} ${user.lastname}`}
+        title={`${user.firstname ?? ""} ${user.lastname}`.trim() || "Utilisateur"}
         description={user.email}
         actions={
           <div className="flex gap-2">
@@ -37,35 +51,65 @@ export default async function UserDetailPage({ params }: Props) {
         }
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 bg-white rounded-xl border border-gray-100 shadow-sm p-6">
-          <h2 className="text-sm font-semibold text-navy mb-4">Informations</h2>
-          <UserForm action={boundUpdate} defaultValues={user} />
-        </div>
+      <UserTabs
+        userId={id}
+        active={activeTab}
+        tabs={[
+          { id: "informations", label: "Informations" },
+          { id: "branding", label: "Branding" },
+          { id: "notion", label: "Notion", hidden: !isNotionUser },
+          { id: "features", label: "Feature flags" },
+          { id: "gmail-labels", label: "Labels Gmail" },
+        ]}
+      />
 
-        <div className="space-y-4">
+      {activeTab === "informations" && (
+        <div className="space-y-6 max-w-2xl">
           <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
-            <h2 className="text-sm font-semibold text-navy mb-3">Liens rapides</h2>
-            <div className="space-y-2">
-              <Button variant="outline" size="sm" className="w-full justify-start" asChild>
-                <Link href={`/immopilot-bo/features?userId=${id}`}>Features</Link>
-              </Button>
-              <Button variant="outline" size="sm" className="w-full justify-start" asChild>
-                <Link href={`/immopilot-bo/gmail-labels?userId=${id}`}>Labels Gmail</Link>
-              </Button>
-            </div>
+            <h2 className="text-sm font-semibold text-navy mb-4">Informations</h2>
+            <UserForm action={boundUpdate} defaultValues={user} />
           </div>
 
-          <div className="bg-white rounded-xl border border-red-50 shadow-sm p-6">
-            <h2 className="text-sm font-semibold text-red-600 mb-3">Zone de danger</h2>
-            <form action={boundDelete}>
-              <Button variant="destructive" size="sm" type="submit">
-                Supprimer l'utilisateur
-              </Button>
-            </form>
+          <div className="bg-white rounded-xl border border-red-100 shadow-sm p-6">
+            <h2 className="text-sm font-semibold text-red-600 mb-1">Zone de danger</h2>
+            <p className="text-xs text-muted mb-4">
+              La suppression est irréversible. Une confirmation par email te sera demandée.
+            </p>
+            <DeleteUserDialog
+              user={{
+                firstname: user.firstname ?? null,
+                lastname: user.lastname,
+                email: user.email,
+              }}
+              action={boundDelete}
+            />
           </div>
         </div>
-      </div>
+      )}
+
+      {activeTab === "branding" && (
+        <div className="max-w-2xl">
+          <BrandingSection userId={id} />
+        </div>
+      )}
+
+      {activeTab === "notion" && isNotionUser && (
+        <div className="max-w-2xl">
+          <NotionConfigSection userId={id} />
+        </div>
+      )}
+
+      {activeTab === "features" && (
+        <div className="max-w-2xl">
+          <FeaturesSection userId={id} />
+        </div>
+      )}
+
+      {activeTab === "gmail-labels" && (
+        <div className="max-w-2xl">
+          <GmailLabelsSection userId={id} />
+        </div>
+      )}
     </div>
   );
 }

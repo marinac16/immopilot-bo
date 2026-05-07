@@ -2,7 +2,7 @@
 
 import { useTransition } from "react";
 import { Switch } from "@/components/ui/switch";
-import { toggleFeatureAction } from "./actions";
+import { toggleFeatureAction } from "./features-actions";
 import type { Feature, UserFeature } from "@/lib/schemas/feature.schema";
 
 interface FeatureToggleProps {

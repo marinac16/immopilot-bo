@@ -68,46 +68,34 @@ export function UserForm({ action, defaultValues, submitLabel = "Enregistrer" }:
       </div>
 
       <hr className="border-gray-100" />
-      <p className="text-xs font-semibold text-muted uppercase tracking-wider">Configuration CRM</p>
+      <p className="text-xs font-semibold text-muted uppercase tracking-wider">Synchronisations</p>
 
-      <div className="space-y-1.5">
-        <Label htmlFor="crmType">Type CRM</Label>
-        <select
-          id="crmType"
-          name="crmType"
-          defaultValue={defaultValues?.crmType ?? ""}
-          onChange={(e) => setCrmType(e.target.value)}
-          className="flex h-9 w-full rounded-lg border border-gray-200 bg-white px-3 py-1 text-sm outline-none focus:border-emerald focus:ring-1 focus:ring-emerald"
-        >
-          <option value="">— choisir —</option>
-          <option value="sheets">Google Sheets</option>
-          <option value="notion">Notion</option>
-        </select>
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-1.5">
+          <Label htmlFor="crmType">Type CRM</Label>
+          <select
+            id="crmType"
+            name="crmType"
+            defaultValue={defaultValues?.crmType ?? ""}
+            onChange={(e) => setCrmType(e.target.value)}
+            className="flex h-9 w-full rounded-lg border border-gray-200 bg-white px-3 py-1 text-sm outline-none focus:border-emerald focus:ring-1 focus:ring-emerald"
+          >
+            <option value="">— choisir —</option>
+            <option value="sheets">Google Sheets</option>
+            <option value="notion">Notion</option>
+          </select>
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="calendarId">Calendar ID</Label>
+          <Input id="calendarId" name="calendarId" defaultValue={defaultValues?.calendarId ?? ""} placeholder="primary" />
+        </div>
       </div>
 
-      {(crmType || defaultValues?.crmType) === "sheets" && (
-        <>
-          <div className="space-y-1.5">
-            <Label htmlFor="googleSpreadsheetId">Spreadsheet ID</Label>
-            <Input id="googleSpreadsheetId" name="googleSpreadsheetId" defaultValue={defaultValues?.googleSpreadsheetId ?? ""} />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="gmailLabel">Gmail Label</Label>
-            <Input id="gmailLabel" name="gmailLabel" defaultValue={defaultValues?.gmailLabel ?? ""} />
-          </div>
-        </>
-      )}
-
-      {(crmType || defaultValues?.crmType) === "notion" && (
+      {crmType === "notion" && defaultValues?.crmType !== "notion" && (
         <p className="text-xs text-muted bg-gray-50 rounded-lg px-4 py-3">
-          La configuration Notion se gère dans la section <strong>Notion</strong>.
+          Enregistrez d&apos;abord pour afficher l&apos;onglet <strong>Notion</strong>.
         </p>
       )}
-
-      <div className="space-y-1.5">
-        <Label htmlFor="calendarId">Calendar ID</Label>
-        <Input id="calendarId" name="calendarId" defaultValue={defaultValues?.calendarId ?? ""} placeholder="primary" />
-      </div>
 
       {state?.error && <p className="text-sm text-red-500">{state.error}</p>}
 

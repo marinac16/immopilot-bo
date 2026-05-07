@@ -16,5 +16,5 @@ export async function toggleFeatureAction(
   } else {
     await toggleFeature(userId, featureId, true);
   }
-  revalidatePath(`/immopilot-bo/features`);
+  revalidatePath(`/immopilot-bo/users/${userId}`);
 }

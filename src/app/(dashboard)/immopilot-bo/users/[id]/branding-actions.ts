@@ -8,7 +8,7 @@ type State = { error?: string; success?: boolean; fieldErrors?: Record<string, s
 
 export async function updateBrandingAction(
   userId: string,
-  state: State,
+  _state: State,
   formData: FormData
 ): Promise<State> {
   const raw = {
@@ -23,7 +23,7 @@ export async function updateBrandingAction(
 
   try {
     await upsertBranding(userId, parsed.data);
-    revalidatePath("/immopilot-bo/branding");
+    revalidatePath(`/immopilot-bo/users/${userId}`);
     return { success: true };
   } catch (err) {
     return { error: err instanceof Error ? err.message : "Erreur lors de la mise à jour." };

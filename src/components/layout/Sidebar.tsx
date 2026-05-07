@@ -3,23 +3,11 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import {
-  Users,
-  ToggleLeft,
-  Mail,
-  Palette,
-  FileText,
-  LayoutDashboard,
-  LogOut,
-} from "lucide-react";
+import { Users, LayoutDashboard, LogOut } from "lucide-react";
 
 const navItems = [
   { href: "/immopilot-bo", label: "Vue d'ensemble", icon: LayoutDashboard },
   { href: "/immopilot-bo/users", label: "Utilisateurs", icon: Users },
-  { href: "/immopilot-bo/features", label: "Feature flags", icon: ToggleLeft },
-  { href: "/immopilot-bo/gmail-labels", label: "Labels Gmail", icon: Mail },
-  { href: "/immopilot-bo/branding", label: "Branding", icon: Palette },
-  { href: "/immopilot-bo/notion", label: "Notion", icon: FileText },
 ];
 
 export function Sidebar() {

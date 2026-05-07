@@ -31,7 +31,7 @@ export async function updateNotionAction(
 
   try {
     await upsertNotionConfig(userId, parsed.data);
-    revalidatePath("/immopilot-bo/notion");
+    revalidatePath(`/immopilot-bo/users/${userId}`);
     return { success: true };
   } catch (err) {
     return { error: err instanceof Error ? err.message : "Erreur lors de la mise à jour." };
