@@ -15,8 +15,8 @@ export async function FeaturesSection({ userId }: FeaturesSectionProps) {
   const enabledCount = userFeatures.filter((uf) => uf.enabled).length;
 
   return (
-    <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-      <div className="flex items-baseline justify-between px-6 py-4 border-b border-gray-100">
+    <div className="bg-white rounded-xl border border-line overflow-hidden">
+      <div className="flex items-baseline justify-between px-6 py-4 border-b border-line">
         <h2 className="text-sm font-semibold text-navy">Feature flags</h2>
         <span className="text-xs text-muted">
           {enabledCount}/{allFeatures.length} active(s)
@@ -25,7 +25,7 @@ export async function FeaturesSection({ userId }: FeaturesSectionProps) {
       {allFeatures.length === 0 ? (
         <p className="px-6 py-8 text-center text-sm text-muted">Aucune feature disponible.</p>
       ) : (
-        <ul className="divide-y divide-gray-50">
+        <ul className="divide-y divide-line">
           {allFeatures.map((feature) => (
             <FeatureToggle
               key={feature.id}

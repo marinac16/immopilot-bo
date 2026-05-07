@@ -47,7 +47,7 @@ export function DeleteUserDialog({ user, action }: DeleteUserDialogProps) {
       </Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-50 bg-navy/40 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
-        <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-full max-w-md -translate-x-1/2 -translate-y-1/2 rounded-xl border border-gray-100 bg-white p-6 shadow-xl focus:outline-none">
+        <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-full max-w-md -translate-x-1/2 -translate-y-1/2 rounded-xl border border-line bg-white p-6 shadow-2xl focus:outline-none">
           <div className="flex items-start gap-3 mb-4">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-50">
               <AlertTriangle className="h-5 w-5 text-red-600" />

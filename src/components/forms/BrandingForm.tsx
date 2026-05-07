@@ -1,9 +1,10 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { toast } from "@/lib/toast";
 import type { Branding } from "@/lib/schemas/branding.schema";
 
 type FormState = { error?: string; success?: boolean; fieldErrors?: Record<string, string[]> } | undefined;
@@ -15,6 +16,11 @@ interface BrandingFormProps {
 
 export function BrandingForm({ action, defaultValues }: BrandingFormProps) {
   const [state, formAction, pending] = useActionState<FormState, FormData>(action, undefined);
+
+  useEffect(() => {
+    if (state?.success) toast.success("Branding mis à jour");
+    else if (state?.error) toast.error("Erreur", state.error);
+  }, [state]);
 
   return (
     <form action={formAction} className="space-y-5">
@@ -45,9 +51,6 @@ export function BrandingForm({ action, defaultValues }: BrandingFormProps) {
           <p className="text-xs text-red-500">{state.fieldErrors.emailFooterUrl[0]}</p>
         )}
       </div>
-
-      {state?.error && <p className="text-sm text-red-500">{state.error}</p>}
-      {state?.success && <p className="text-sm text-emerald">Branding mis à jour.</p>}
 
       <Button type="submit" disabled={pending}>
         {pending ? "Enregistrement…" : "Enregistrer"}

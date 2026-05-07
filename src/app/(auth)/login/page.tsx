@@ -10,11 +10,11 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
-          <h1 className="text-2xl font-bold text-navy">ImmoPilot</h1>
+          <h1 className="text-2xl font-semibold text-navy tracking-tight">ImmoPilot</h1>
           <p className="text-sm text-muted mt-1">Backoffice admin</p>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
+        <div className="bg-white rounded-xl border border-line p-8">
           <form action={formAction} className="space-y-4">
             <div>
               <label

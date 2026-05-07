@@ -15,7 +15,7 @@ export default function NewUserPage() {
           </Button>
         }
       />
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+      <div className="bg-white rounded-xl border border-line p-6 max-w-2xl">
         <UserForm action={createUserAction} submitLabel="Créer l'utilisateur" />
       </div>
     </div>

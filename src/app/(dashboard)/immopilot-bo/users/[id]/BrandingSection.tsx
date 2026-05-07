@@ -11,7 +11,7 @@ export async function BrandingSection({ userId }: BrandingSectionProps) {
   const boundAction = updateBrandingAction.bind(null, userId);
 
   return (
-    <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+    <div className="bg-white rounded-xl border border-line p-6">
       <div className="flex items-baseline justify-between mb-1">
         <h2 className="text-sm font-semibold text-navy">Branding</h2>
         <span className="text-xs text-muted">propre à cet utilisateur</span>

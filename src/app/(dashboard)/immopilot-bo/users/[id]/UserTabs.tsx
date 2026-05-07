@@ -24,7 +24,7 @@ export function UserTabs({ userId, active, tabs }: UserTabsProps) {
   const visible = tabs.filter((t) => !t.hidden);
 
   return (
-    <div className="border-b border-gray-200 mb-6">
+    <div className="border-b border-line mb-6">
       <nav className="flex gap-1 -mb-px overflow-x-auto" aria-label="Sections de l'utilisateur">
         {visible.map((tab) => {
           const isActive = tab.id === active;
@@ -40,10 +40,10 @@ export function UserTabs({ userId, active, tabs }: UserTabsProps) {
               prefetch={false}
               aria-current={isActive ? "page" : undefined}
               className={cn(
-                "px-4 py-2.5 text-sm font-medium border-b-2 transition-colors whitespace-nowrap",
+                "px-3 py-2.5 text-sm font-medium border-b-2 transition-colors whitespace-nowrap",
                 isActive
                   ? "border-emerald text-navy"
-                  : "border-transparent text-muted hover:text-navy hover:border-gray-200"
+                  : "border-transparent text-gray-500 hover:text-navy hover:border-line"
               )}
             >
               {tab.label}

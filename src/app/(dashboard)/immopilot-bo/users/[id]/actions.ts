@@ -5,11 +5,13 @@ import { revalidatePath } from "next/cache";
 import { updateUser, deleteUser } from "@/lib/api/users";
 import { UpdateUserSchema } from "@/lib/schemas/user.schema";
 
-type State = { error?: string; fieldErrors?: Record<string, string[]> } | undefined;
+type State =
+  | { error?: string; fieldErrors?: Record<string, string[]>; success?: boolean }
+  | undefined;
 
 export async function updateUserAction(
   userId: string,
-  state: State,
+  _state: State,
   formData: FormData
 ): Promise<State> {
   const raw = {
@@ -33,6 +35,7 @@ export async function updateUserAction(
     await updateUser(userId, parsed.data);
     revalidatePath(`/immopilot-bo/users/${userId}`);
     revalidatePath("/immopilot-bo/users");
+    return { success: true };
   } catch (err) {
     return { error: err instanceof Error ? err.message : "Erreur lors de la mise à jour." };
   }

@@ -9,6 +9,10 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ["var(--font-geist-sans)", "ui-sans-serif", "system-ui", "sans-serif"],
+        mono: ["var(--font-geist-mono)", "ui-monospace", "monospace"],
+      },
       colors: {
         navy: {
           DEFAULT: "#1c293c",
@@ -19,7 +23,9 @@ const config: Config = {
           light: "#00a876",
         },
         muted: "#8b9ab0",
-        background: "#f5f7fa",
+        background: "#fafafa",
+        surface: "#ffffff",
+        line: "#e5e7eb",
       },
       borderRadius: {
         lg: "var(--radius)",

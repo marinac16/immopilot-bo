@@ -45,9 +45,9 @@ export function DataTable<TData>({
         />
       )}
 
-      <div className="rounded-xl border border-gray-100 overflow-hidden bg-white shadow-sm">
+      <div className="rounded-xl border border-line overflow-hidden bg-white">
         <table className="w-full text-sm">
-          <thead className="bg-gray-50 border-b border-gray-100">
+          <thead className="bg-gray-50/50 border-b border-line">
             {table.getHeaderGroups().map((hg) => (
               <tr key={hg.id}>
                 {hg.headers.map((header) => (
@@ -61,7 +61,7 @@ export function DataTable<TData>({
               </tr>
             ))}
           </thead>
-          <tbody className="divide-y divide-gray-50">
+          <tbody className="divide-y divide-line">
             {table.getRowModel().rows.length === 0 ? (
               <tr>
                 <td

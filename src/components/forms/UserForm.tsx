@@ -1,12 +1,15 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { toast } from "@/lib/toast";
 import type { User } from "@/lib/schemas/user.schema";
 
-type FormState = { error?: string; fieldErrors?: Record<string, string[]> } | undefined;
+type FormState =
+  | { error?: string; fieldErrors?: Record<string, string[]>; success?: boolean }
+  | undefined;
 
 interface UserFormProps {
   action: (state: FormState, formData: FormData) => Promise<FormState>;
@@ -14,9 +17,18 @@ interface UserFormProps {
   submitLabel?: string;
 }
 
+const selectClass =
+  "flex h-9 w-full rounded-lg border border-line bg-white px-3 py-1 text-sm text-navy outline-none transition-shadow focus:border-emerald/60 focus:ring-2 focus:ring-emerald/15";
+
 export function UserForm({ action, defaultValues, submitLabel = "Enregistrer" }: UserFormProps) {
   const [state, formAction, pending] = useActionState<FormState, FormData>(action, undefined);
   const [crmType, setCrmType] = useState(defaultValues?.crmType ?? "");
+
+  useEffect(() => {
+    if (state?.success) toast.success("Utilisateur enregistré");
+    else if (state?.error) toast.error("Erreur", state.error);
+    else if (state?.fieldErrors) toast.error("Champs invalides", "Vérifie les champs en rouge.");
+  }, [state]);
 
   return (
     <form action={formAction} className="space-y-5 max-w-lg">
@@ -56,7 +68,7 @@ export function UserForm({ action, defaultValues, submitLabel = "Enregistrer" }:
             id="status"
             name="status"
             defaultValue={defaultValues?.status ?? ""}
-            className="flex h-9 w-full rounded-lg border border-gray-200 bg-white px-3 py-1 text-sm outline-none focus:border-emerald focus:ring-1 focus:ring-emerald"
+            className={selectClass}
           >
             <option value="">— choisir —</option>
             <option value="PENDING">PENDING</option>
@@ -67,7 +79,7 @@ export function UserForm({ action, defaultValues, submitLabel = "Enregistrer" }:
         </div>
       </div>
 
-      <hr className="border-gray-100" />
+      <hr className="border-line" />
       <p className="text-xs font-semibold text-muted uppercase tracking-wider">Synchronisations</p>
 
       <div className="grid grid-cols-2 gap-4">
@@ -78,7 +90,7 @@ export function UserForm({ action, defaultValues, submitLabel = "Enregistrer" }:
             name="crmType"
             defaultValue={defaultValues?.crmType ?? ""}
             onChange={(e) => setCrmType(e.target.value)}
-            className="flex h-9 w-full rounded-lg border border-gray-200 bg-white px-3 py-1 text-sm outline-none focus:border-emerald focus:ring-1 focus:ring-emerald"
+            className={selectClass}
           >
             <option value="">— choisir —</option>
             <option value="sheets">Google Sheets</option>
@@ -96,8 +108,6 @@ export function UserForm({ action, defaultValues, submitLabel = "Enregistrer" }:
           Enregistrez d&apos;abord pour afficher l&apos;onglet <strong>Notion</strong>.
         </p>
       )}
-
-      {state?.error && <p className="text-sm text-red-500">{state.error}</p>}
 
       <Button type="submit" disabled={pending}>
         {pending ? "Enregistrement…" : submitLabel}

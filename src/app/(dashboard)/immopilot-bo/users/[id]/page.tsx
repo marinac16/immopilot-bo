@@ -1,7 +1,9 @@
+import { Suspense } from "react";
 import { getUser, getOAuthStatus } from "@/lib/api/users";
 import { Header } from "@/components/layout/Header";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { SectionSkeleton, ListSkeleton } from "@/components/ui/skeleton";
 import { UserForm } from "@/components/forms/UserForm";
 import { UserTabs, isValidTab, type UserTabId } from "./UserTabs";
 import { NotionConfigSection } from "./NotionConfigSection";
@@ -65,12 +67,12 @@ export default async function UserDetailPage({ params, searchParams }: Props) {
 
       {activeTab === "informations" && (
         <div className="space-y-6 max-w-2xl">
-          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+          <div className="bg-white rounded-xl border border-line p-6">
             <h2 className="text-sm font-semibold text-navy mb-4">Informations</h2>
             <UserForm action={boundUpdate} defaultValues={user} />
           </div>
 
-          <div className="bg-white rounded-xl border border-red-100 shadow-sm p-6">
+          <div className="bg-white rounded-xl border border-red-200 p-6">
             <h2 className="text-sm font-semibold text-red-600 mb-1">Zone de danger</h2>
             <p className="text-xs text-muted mb-4">
               La suppression est irréversible. Une confirmation par email te sera demandée.
@@ -89,25 +91,33 @@ export default async function UserDetailPage({ params, searchParams }: Props) {
 
       {activeTab === "branding" && (
         <div className="max-w-2xl">
-          <BrandingSection userId={id} />
+          <Suspense fallback={<SectionSkeleton title="Branding" rows={2} />}>
+            <BrandingSection userId={id} />
+          </Suspense>
         </div>
       )}
 
       {activeTab === "notion" && isNotionUser && (
         <div className="max-w-2xl">
-          <NotionConfigSection userId={id} />
+          <Suspense fallback={<SectionSkeleton title="Configuration Notion" rows={6} />}>
+            <NotionConfigSection userId={id} />
+          </Suspense>
         </div>
       )}
 
       {activeTab === "features" && (
         <div className="max-w-2xl">
-          <FeaturesSection userId={id} />
+          <Suspense fallback={<ListSkeleton rows={4} />}>
+            <FeaturesSection userId={id} />
+          </Suspense>
         </div>
       )}
 
       {activeTab === "gmail-labels" && (
         <div className="max-w-2xl">
-          <GmailLabelsSection userId={id} />
+          <Suspense fallback={<ListSkeleton rows={6} />}>
+            <GmailLabelsSection userId={id} />
+          </Suspense>
         </div>
       )}
     </div>
