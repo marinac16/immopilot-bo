@@ -8,7 +8,7 @@ type State = { error?: string; success?: boolean } | undefined;
 
 export async function updateNotionAction(
   userId: string,
-  state: State,
+  _state: State,
   formData: FormData
 ): Promise<State> {
   const raw = {
@@ -21,6 +21,7 @@ export async function updateNotionAction(
     contacts: formData.get("contacts") || undefined,
     taches: formData.get("taches") || undefined,
     templateMessages: formData.get("templateMessages") || undefined,
+    promptAgentAjouterTache: formData.get("promptAgentAjouterTache") || undefined,
   };
 
   const parsed = UpdateNotionConfigSchema.safeParse(raw);

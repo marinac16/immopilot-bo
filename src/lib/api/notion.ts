@@ -15,7 +15,7 @@ export async function upsertNotionConfig(
   input: UpdateNotionConfigInput
 ): Promise<NotionConfig> {
   const data = await apiRequest<unknown>(`/notion-config/${userId}`, {
-    method: "PATCH",
+    method: "PUT",
     body: input,
   });
   return zparse(NotionConfigSchema, data);

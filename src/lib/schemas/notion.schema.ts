@@ -12,6 +12,7 @@ export const NotionConfigSchema = z.object({
   contacts: z.string().nullable().optional(),
   taches: z.string().nullable().optional(),
   templateMessages: z.string().nullable().optional(),
+  promptAgentAjouterTache: z.string().nullable().optional(),
   createdAt: z.string().datetime().optional(),
   updatedAt: z.string().datetime().optional(),
 });

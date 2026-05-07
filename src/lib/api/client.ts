@@ -3,7 +3,7 @@ import type { ZodType } from "zod";
 const BASE_URL = process.env.API_URL;
 const API_KEY = process.env.API_KEY;
 
-type HttpMethod = "GET" | "POST" | "PATCH" | "DELETE";
+type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
 interface RequestOptions {
   method?: HttpMethod;

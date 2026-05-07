@@ -23,6 +23,7 @@ const NOTION_FIELDS: { name: keyof NotionConfig; label: string }[] = [
   { name: "contacts", label: "DB — Contacts" },
   { name: "taches", label: "DB — Tâches" },
   { name: "templateMessages", label: "DB — Template messages" },
+  { name: "promptAgentAjouterTache", label: "Prompt — Ajouter une tâche" },
 ];
 
 export function NotionForm({ action, defaultValues }: NotionFormProps) {
