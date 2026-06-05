@@ -8,7 +8,6 @@ import { UserForm } from "@/components/forms/UserForm";
 import { UserTabs, isValidTab, type UserTabId } from "./UserTabs";
 import { NotionConfigSection } from "./NotionConfigSection";
 import { BrandingSection } from "./BrandingSection";
-import { FeaturesSection } from "./FeaturesSection";
 import { GmailLabelsSection } from "./GmailLabelsSection";
 import { OnboardingSection } from "./OnboardingSection";
 import { DeleteUserDialog } from "./DeleteUserDialog";
@@ -61,7 +60,6 @@ export default async function UserDetailPage({ params, searchParams }: Props) {
           { id: "informations", label: "Informations" },
           { id: "branding", label: "Branding" },
           { id: "notion", label: "Notion", hidden: !isNotionUser },
-          { id: "features", label: "Feature flags" },
           { id: "gmail-labels", label: "Labels Gmail" },
           { id: "onboarding", label: "Onboarding" },
         ]}
@@ -103,14 +101,6 @@ export default async function UserDetailPage({ params, searchParams }: Props) {
         <div className="max-w-2xl">
           <Suspense fallback={<SectionSkeleton title="Configuration Notion" rows={6} />}>
             <NotionConfigSection userId={id} />
-          </Suspense>
-        </div>
-      )}
-
-      {activeTab === "features" && (
-        <div className="max-w-2xl">
-          <Suspense fallback={<ListSkeleton rows={4} />}>
-            <FeaturesSection userId={id} />
           </Suspense>
         </div>
       )}
