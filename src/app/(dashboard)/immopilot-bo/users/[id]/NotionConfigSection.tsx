@@ -1,5 +1,6 @@
 import { getNotionConfig } from "@/lib/api/notion";
 import { NotionForm } from "@/components/forms/NotionForm";
+import { SyncNotionButton } from "./SyncNotionButton";
 import { updateNotionAction } from "./notion-actions";
 
 interface NotionConfigSectionProps {
@@ -12,17 +13,31 @@ export async function NotionConfigSection({ userId }: NotionConfigSectionProps) 
     syncEnabled: false,
   }));
   const boundAction = updateNotionAction.bind(null, userId);
+  const hasToken = !!(config as { notionToken?: string | null }).notionToken;
 
   return (
-    <div className="bg-white rounded-xl border border-line p-6">
-      <div className="flex items-baseline justify-between mb-1">
-        <h2 className="text-sm font-semibold text-navy">Configuration Notion</h2>
-        <span className="text-xs text-muted">propre à cet utilisateur</span>
+    <div className="space-y-4">
+      <div className="bg-white rounded-xl border border-line p-6">
+        <div className="flex items-baseline justify-between mb-1">
+          <h2 className="text-sm font-semibold text-navy">Configuration Notion</h2>
+          <span className="text-xs text-muted">propre à cet utilisateur</span>
+        </div>
+        <p className="text-xs text-muted mb-4">
+          Token et identifiants des bases Notion utilisés pour synchroniser les données.
+        </p>
+        <NotionForm action={boundAction} defaultValues={config} />
       </div>
-      <p className="text-xs text-muted mb-4">
-        Token et identifiants des bases Notion utilisés pour synchroniser les données.
-      </p>
-      <NotionForm action={boundAction} defaultValues={config} />
+
+      {/* Sync auto — visible uniquement si le token est renseigné */}
+      {hasToken && (
+        <div className="bg-white rounded-xl border border-line p-6">
+          <div className="flex items-baseline justify-between mb-3">
+            <h2 className="text-sm font-semibold text-navy">Récupération automatique</h2>
+            <span className="text-xs text-muted">bases + prompts</span>
+          </div>
+          <SyncNotionButton userId={userId} />
+        </div>
+      )}
     </div>
   );
 }

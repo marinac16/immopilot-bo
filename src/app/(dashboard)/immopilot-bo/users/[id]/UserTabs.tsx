@@ -6,7 +6,8 @@ export type UserTabId =
   | "branding"
   | "notion"
   | "features"
-  | "gmail-labels";
+  | "gmail-labels"
+  | "onboarding";
 
 export interface UserTabDef {
   id: UserTabId;
@@ -61,6 +62,7 @@ export function isValidTab(value: string | undefined): value is UserTabId {
     value === "branding" ||
     value === "notion" ||
     value === "features" ||
-    value === "gmail-labels"
+    value === "gmail-labels" ||
+    value === "onboarding"
   );
 }

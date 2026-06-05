@@ -10,6 +10,7 @@ import { NotionConfigSection } from "./NotionConfigSection";
 import { BrandingSection } from "./BrandingSection";
 import { FeaturesSection } from "./FeaturesSection";
 import { GmailLabelsSection } from "./GmailLabelsSection";
+import { OnboardingSection } from "./OnboardingSection";
 import { DeleteUserDialog } from "./DeleteUserDialog";
 import { updateUserAction, deleteUserAction } from "./actions";
 import Link from "next/link";
@@ -62,6 +63,7 @@ export default async function UserDetailPage({ params, searchParams }: Props) {
           { id: "notion", label: "Notion", hidden: !isNotionUser },
           { id: "features", label: "Feature flags" },
           { id: "gmail-labels", label: "Labels Gmail" },
+          { id: "onboarding", label: "Onboarding" },
         ]}
       />
 
@@ -119,6 +121,12 @@ export default async function UserDetailPage({ params, searchParams }: Props) {
             <GmailLabelsSection userId={id} />
           </Suspense>
         </div>
+      )}
+
+      {activeTab === "onboarding" && (
+        <Suspense fallback={<ListSkeleton rows={7} />}>
+          <OnboardingSection userId={id} />
+        </Suspense>
       )}
     </div>
   );
