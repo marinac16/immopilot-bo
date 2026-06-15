@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useTransition } from "react";
 import type { OnboardingStatus } from "@/lib/schemas/onboarding.schema";
 import { SetupGmailLabelsButton } from "./SetupGmailLabelsButton";
@@ -8,6 +9,7 @@ import { SetupGmailLabelsButton } from "./SetupGmailLabelsButton";
 
 type ManualStepKey =
   | "notionWorkspaceReady"
+  | "notionIntegrationCreated"
   | "notionBasesShared"
   | "googleTestUserAdded"
   | "onboardingValidated";
@@ -41,8 +43,8 @@ const PARTS: PartDef[] = [
       {
         key: "notionIntegrationCreated",
         label: "Intégration Notion créée",
-        description: "Token ntn_… créé sur notion.so/my-integrations et renseigné dans la config.",
-        manual: false,
+        description: "Token ntn_… créé sur notion.so/my-integrations et renseigné dans l'onglet Notion ci-dessus.",
+        manual: true,
       },
       {
         key: "notionBasesShared",
@@ -53,7 +55,8 @@ const PARTS: PartDef[] = [
       {
         key: "notionDatabasesConnected",
         label: "IDs des bases renseignés",
-        description: "Les 8 IDs de bases sont renseignés dans la config (Leads, Contacts, Visites, Biens, Relances, Équipe, Tâches, Templates).",
+        description:
+          'Les 8 IDs de bases ont été détectés automatiquement via le bouton "Détecter les bases" dans l\'onglet Notion (Leads, Contacts, Visites, Biens, Relances, Équipe, Tâches, Templates).',
         manual: false,
       },
     ],
@@ -231,6 +234,41 @@ export function OnboardingChecklist({ userId, status, onToggle }: Props) {
                         {!step.manual && <AutoBadge />}
                       </div>
                       <p className="text-xs text-muted leading-relaxed">{step.description}</p>
+
+                      {step.key === "notionDatabasesConnected" && !isCompleted && (
+                        <div className="mt-2 space-y-2">
+                          <div className="rounded-lg bg-gray-50 border border-line px-3 py-2 text-xs text-gray-600 leading-relaxed">
+                            <ol className="list-decimal list-inside space-y-0.5">
+                              <li>Renseigne le token Notion (ntn_…)</li>
+                              <li>Colle l&apos;URL de la page ImmoPilot Master du client</li>
+                              <li>Clique sur &quot;Détecter les bases&quot;</li>
+                              <li>Vérifie le mapping et enregistre</li>
+                            </ol>
+                          </div>
+                          <Link
+                            href={`/immopilot-bo/users/${userId}?tab=notion`}
+                            scroll={false}
+                            className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg border border-line bg-white text-navy hover:bg-gray-50 hover:border-gray-300 transition-all group"
+                          >
+                            <span aria-hidden>⚙️</span>
+                            <span>Configurer dans l&apos;onglet Notion</span>
+                            <svg
+                              className="w-3 h-3 text-gray-400 transition-all group-hover:translate-x-0.5 group-hover:text-navy"
+                              fill="none"
+                              viewBox="0 0 16 16"
+                              aria-hidden
+                            >
+                              <path
+                                d="M6 4l4 4-4 4"
+                                stroke="currentColor"
+                                strokeWidth="1.5"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                            </svg>
+                          </Link>
+                        </div>
+                      )}
                     </div>
 
                     {/* Bouton toggle pour les étapes manuelles */}

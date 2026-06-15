@@ -2,10 +2,11 @@ import { z } from "zod";
 
 // ─── Étapes manuelles (ne peuvent pas être déduites des données) ───────────────
 export const OnboardingManualStepsSchema = z.object({
-  notionWorkspaceReady:  z.boolean().default(false), // Workspace ImmoPilot Master dupliqué
-  notionBasesShared:     z.boolean().default(false), // Bases partagées avec l'intégration Atelium Bot
-  googleTestUserAdded:   z.boolean().default(false), // Ajouté comme utilisateur test sur GCP
-  onboardingValidated:   z.boolean().default(false), // Test de bout en bout validé
+  notionWorkspaceReady:     z.boolean().default(false), // Workspace ImmoPilot Master dupliqué
+  notionIntegrationCreated: z.boolean().default(false), // Token ntn_… créé et renseigné dans l'onglet Notion
+  notionBasesShared:        z.boolean().default(false), // Bases partagées avec l'intégration Atelium Bot
+  googleTestUserAdded:      z.boolean().default(false), // Ajouté comme utilisateur test sur GCP
+  onboardingValidated:      z.boolean().default(false), // Test de bout en bout validé
 });
 
 // ─── Statut complet retourné par l'API ────────────────────────────────────────
@@ -14,9 +15,9 @@ export const OnboardingStatusSchema = z.object({
   steps: z.object({
     // PARTIE 1 — Notion
     notionWorkspaceReady:      z.boolean(), // Manuel : workspace ImmoPilot Master dupliqué
-    notionIntegrationCreated:  z.boolean(), // Auto   : notionToken renseigné
+    notionIntegrationCreated:  z.boolean(), // Manuel : token ntn_… créé et renseigné dans l'onglet Notion
     notionBasesShared:         z.boolean(), // Manuel : bases partagées avec Atelium Bot dans l'UI Notion
-    notionDatabasesConnected:  z.boolean(), // Auto   : tous les IDs de bases renseignés
+    notionDatabasesConnected:  z.boolean(), // Auto   : les 8 IDs de bases renseignés dans NotionConfig
     // PARTIE 2 — Google Cloud
     googleTestUserAdded:       z.boolean(), // Manuel : ajouté comme utilisateur test sur GCP (avant Telegram !)
     // PARTIE 3 — Telegram + Google OAuth

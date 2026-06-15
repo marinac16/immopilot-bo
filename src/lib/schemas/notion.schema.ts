@@ -4,6 +4,7 @@ export const NotionConfigSchema = z.object({
   id: z.string().optional(),
   userId: z.string(),
   notionToken: z.string().nullable().optional(),
+  notionParentPageId: z.string().nullable().optional(),
   leadsAcquereurs: z.string().nullable().optional(),
   visites: z.string().nullable().optional(),
   biens: z.string().nullable().optional(),

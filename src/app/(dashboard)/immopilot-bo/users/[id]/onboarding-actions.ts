@@ -5,6 +5,7 @@ import { updateOnboardingManualSteps } from "@/lib/api/onboarding";
 
 type ManualStepKey =
   | "notionWorkspaceReady"
+  | "notionIntegrationCreated"
   | "notionBasesShared"
   | "googleTestUserAdded"
   | "onboardingValidated";

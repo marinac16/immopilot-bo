@@ -9,6 +9,7 @@ export const notionHandlers = [
       data: {
         userId: params.userId,
         notionToken: null,
+        notionParentPageId: null,
         leadsAcquereurs: null,
         visites: null,
         biens: null,

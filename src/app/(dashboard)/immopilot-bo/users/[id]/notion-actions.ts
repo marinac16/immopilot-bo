@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { getNotionConfig, upsertNotionConfig } from "@/lib/api/notion";
 import { UpdateNotionConfigSchema } from "@/lib/schemas/notion.schema";
+import { formatNotionUuid, isValidNotionId } from "@/lib/notion-utils";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -98,6 +99,238 @@ function getNotionTitle(item: { title?: Array<{ plain_text: string }>; propertie
   return item.properties?.title?.title?.map((t) => t.plain_text).join("").trim() ?? "";
 }
 
+// ─── Détection des bases (formulaire) ───────────────────────────────────────
+
+export type DetectNotionDatabasesResult =
+  | { success: true; databases: { id: string; title: string }[] }
+  | { success: false; error: string };
+
+const NOTION_VERSION = "2022-06-28";
+
+function notionHeaders(token: string): HeadersInit {
+  return {
+    Authorization: `Bearer ${token}`,
+    "Notion-Version": NOTION_VERSION,
+  };
+}
+
+function notionIdVariants(rawId: string): string[] {
+  const clean = rawId.replace(/-/g, "");
+  if (clean.length !== 32) return [rawId];
+  const uuid = formatNotionUuid(clean);
+  return [...new Set([uuid, clean])];
+}
+
+function getChildDatabaseTitle(
+  childDatabase: { title?: string | Array<{ plain_text: string }> } | undefined
+): string {
+  const title = childDatabase?.title;
+  if (!title) return "";
+  if (typeof title === "string") return title;
+  return title.map((t) => t.plain_text).join("");
+}
+
+type NotionBlock = {
+  id: string;
+  type: string;
+  has_children?: boolean;
+  child_database?: { title?: string | Array<{ plain_text: string }> };
+};
+
+type CollectResult = {
+  databases: { id: string; title: string }[];
+  status?: number;
+};
+
+async function fetchBlockChildren(
+  token: string,
+  blockId: string,
+  cursor?: string
+): Promise<
+  | { ok: true; results: NotionBlock[]; has_more: boolean; next_cursor?: string }
+  | { ok: false; status: number }
+> {
+  const url = new URL(`https://api.notion.com/v1/blocks/${blockId}/children`);
+  url.searchParams.set("page_size", "100");
+  if (cursor) url.searchParams.set("start_cursor", cursor);
+
+  const res = await fetch(url.toString(), { headers: notionHeaders(token) });
+  if (!res.ok) return { ok: false, status: res.status };
+
+  const data = (await res.json()) as {
+    results: NotionBlock[];
+    has_more: boolean;
+    next_cursor?: string;
+  };
+  return { ok: true, results: data.results, has_more: data.has_more, next_cursor: data.next_cursor };
+}
+
+async function collectChildDatabases(
+  token: string,
+  blockId: string,
+  depth = 0,
+  visited = new Set<string>()
+): Promise<CollectResult> {
+  if (depth > 6 || visited.has(blockId)) return { databases: [] };
+  visited.add(blockId);
+
+  const databases: { id: string; title: string }[] = [];
+  let cursor: string | undefined;
+
+  do {
+    const page = await fetchBlockChildren(token, blockId, cursor);
+    if (!page.ok) {
+      return { databases: [], status: page.status };
+    }
+
+    for (const block of page.results) {
+      if (block.type === "child_database") {
+        const title = getChildDatabaseTitle(block.child_database);
+        if (title) databases.push({ id: block.id, title });
+      } else if (block.has_children) {
+        const nested = await collectChildDatabases(token, block.id, depth + 1, visited);
+        if (nested.status === 401 || nested.status === 403) return nested;
+        databases.push(...nested.databases);
+      }
+    }
+
+    cursor = page.has_more ? page.next_cursor : undefined;
+  } while (cursor);
+
+  return { databases };
+}
+
+async function searchAllDatabases(token: string): Promise<{ id: string; title: string }[]> {
+  const databases: { id: string; title: string }[] = [];
+  let cursor: string | undefined;
+
+  do {
+    const res = await fetch("https://api.notion.com/v1/search", {
+      method: "POST",
+      headers: { ...notionHeaders(token), "Content-Type": "application/json" },
+      body: JSON.stringify({
+        filter: { value: "database", property: "object" },
+        page_size: 100,
+        ...(cursor ? { start_cursor: cursor } : {}),
+      }),
+    });
+
+    if (!res.ok) break;
+
+    const data = (await res.json()) as {
+      results: Array<{ id: string; title?: Array<{ plain_text: string }> }>;
+      has_more: boolean;
+      next_cursor?: string;
+    };
+
+    for (const result of data.results) {
+      const title = result.title?.map((t) => t.plain_text).join("") ?? "";
+      if (title) databases.push({ id: result.id, title });
+    }
+
+    cursor = data.has_more ? data.next_cursor : undefined;
+  } while (cursor);
+
+  return databases;
+}
+
+async function isDatabaseUrl(token: string, rawId: string): Promise<boolean> {
+  for (const id of notionIdVariants(rawId)) {
+    const res = await fetch(`https://api.notion.com/v1/databases/${id}`, {
+      headers: notionHeaders(token),
+    });
+    if (res.ok) return true;
+    if (res.status === 401 || res.status === 403) return false;
+  }
+  return false;
+}
+
+export async function detectNotionDatabases(
+  token: string,
+  parentPageId: string
+): Promise<DetectNotionDatabasesResult> {
+  if (!token.startsWith("ntn_")) {
+    return { success: false, error: "Token invalide" };
+  }
+
+  if (!parentPageId.trim()) {
+    return { success: false, error: "Page parent requise" };
+  }
+
+  if (!isValidNotionId(parentPageId)) {
+    return { success: false, error: "URL ou ID de page invalide, vérifiez le format" };
+  }
+
+  const cleanId = parentPageId.replace(/-/g, "");
+
+  try {
+    // 1. Resoudre la page via GET /pages (ID canonique)
+    for (const id of notionIdVariants(cleanId)) {
+      const res = await fetch(`https://api.notion.com/v1/pages/${id}`, {
+        headers: notionHeaders(token),
+      });
+
+      if (res.status === 401) {
+        return { success: false, error: "Token Notion invalide ou expiré" };
+      }
+      if (res.status === 403) {
+        return { success: false, error: "La page n'est pas partagée avec l'intégration Atelium Bot" };
+      }
+      if (res.ok) {
+        const page = (await res.json()) as { id: string };
+        const collected = await collectChildDatabases(token, page.id);
+        if (collected.status === 401) {
+          return { success: false, error: "Token Notion invalide ou expiré" };
+        }
+        if (collected.status === 403) {
+          return { success: false, error: "La page n'est pas partagée avec l'intégration Atelium Bot" };
+        }
+        if (collected.databases.length > 0) {
+          return { success: true, databases: collected.databases };
+        }
+        break;
+      }
+    }
+
+    // 2. Essayer blocks/children directement (variantes d'ID)
+    for (const id of notionIdVariants(cleanId)) {
+      const collected = await collectChildDatabases(token, id);
+      if (collected.status === 401) {
+        return { success: false, error: "Token Notion invalide ou expiré" };
+      }
+      if (collected.status === 403) {
+        return { success: false, error: "La page n'est pas partagée avec l'intégration Atelium Bot" };
+      }
+      if (collected.databases.length > 0) {
+        return { success: true, databases: collected.databases };
+      }
+    }
+
+    // 3. URL pointe peut-etre vers une base, pas la page parent
+    if (await isDatabaseUrl(token, cleanId)) {
+      return {
+        success: false,
+        error:
+          "Cette URL pointe vers une base de données. Collez l'URL de la page parent ImmoPilot qui contient toutes les bases.",
+      };
+    }
+
+    // 4. Fallback : search workspace (bases individuellement partagees)
+    const searched = await searchAllDatabases(token);
+    if (searched.length > 0) {
+      return { success: true, databases: searched };
+    }
+
+    return {
+      success: false,
+      error:
+        "Page introuvable ou non partagée avec l'intégration Atelium Bot. Ouvrez la page parent dans Notion, puis ··· → Connections → ajoutez Atelium Bot.",
+    };
+  } catch {
+    return { success: false, error: "Erreur réseau lors de l'appel à l'API Notion." };
+  }
+}
+
 // ─── Action principale ────────────────────────────────────────────────────────
 
 export async function syncNotionDatabasesAction(userId: string): Promise<SyncResult> {
@@ -191,6 +424,7 @@ export async function updateNotionAction(
 ): Promise<State> {
   const raw = {
     notionToken: formData.get("notionToken") || undefined,
+    notionParentPageId: formData.get("notionParentPageId") || undefined,
     leadsAcquereurs: formData.get("leadsAcquereurs") || undefined,
     visites: formData.get("visites") || undefined,
     biens: formData.get("biens") || undefined,

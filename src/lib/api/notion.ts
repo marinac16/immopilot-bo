@@ -14,9 +14,12 @@ export async function upsertNotionConfig(
   userId: string,
   input: UpdateNotionConfigInput
 ): Promise<NotionConfig> {
+  // notionParentPageId : champ BO uniquement tant que l'API ne l'expose pas en base
+  const { notionParentPageId: _parentPageId, ...apiInput } = input;
+
   const data = await apiRequest<unknown>(`/notion-config/${userId}`, {
     method: "PUT",
-    body: input,
+    body: apiInput,
   });
   return zparse(NotionConfigSchema, data);
 }
