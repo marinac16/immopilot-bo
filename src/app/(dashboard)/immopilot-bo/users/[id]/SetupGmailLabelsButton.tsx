@@ -22,7 +22,7 @@ export function SetupGmailLabelsButton({ userId, compact = false }: Props) {
 
   return (
     <div className={compact ? "space-y-2" : "px-6 py-4 border-t border-line space-y-3"}>
-      <div className="flex items-center justify-between">
+      <div className={compact ? undefined : "flex items-center justify-between"}>
         {!compact && (
           <p className="text-xs text-muted">
             Crée les labels ImmoPilot dans Gmail du client s'ils n'existent pas encore.
@@ -32,7 +32,7 @@ export function SetupGmailLabelsButton({ userId, compact = false }: Props) {
           type="button"
           onClick={handleSetup}
           disabled={pending}
-          className="flex-shrink-0 ml-4 inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg border border-emerald-200 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className={`inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg border border-emerald-200 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors${compact ? "" : " flex-shrink-0 ml-4"}`}
         >
           {pending ? (
             <>

@@ -8,6 +8,7 @@ type ManualStepKey =
   | "notionIntegrationCreated"
   | "notionBasesShared"
   | "googleTestUserAdded"
+  | "templateMessagesPersonalized"
   | "onboardingValidated";
 
 type State = { error?: string; success?: boolean } | undefined;

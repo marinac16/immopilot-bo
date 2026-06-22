@@ -6,6 +6,7 @@ export const OnboardingManualStepsSchema = z.object({
   notionIntegrationCreated: z.boolean().default(false), // Token ntn_… créé et renseigné dans l'onglet Notion
   notionBasesShared:        z.boolean().default(false), // Bases partagées avec l'intégration Atelium Bot
   googleTestUserAdded:      z.boolean().default(false), // Ajouté comme utilisateur test sur GCP
+  templateMessagesPersonalized: z.boolean().default(false), // Config templates messages rempli dans Notion
   onboardingValidated:      z.boolean().default(false), // Test de bout en bout validé
 });
 
@@ -26,6 +27,7 @@ export const OnboardingStatusSchema = z.object({
     gmailLabelsCreated:        z.boolean(), // Auto   : labels Gmail ImmoPilot créés
     // PARTIE 4 — Finalisation
     promptUpdated:             z.boolean(), // Auto   : promptAgentAjouterTache renseigné
+    templateMessagesPersonalized: z.boolean().default(false), // Manuel : Config templates messages rempli pour les emails
     onboardingValidated:       z.boolean(), // Manuel : test de bout en bout validé
   }),
   progress: z.object({

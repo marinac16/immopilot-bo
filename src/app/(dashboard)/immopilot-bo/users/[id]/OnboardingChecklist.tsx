@@ -12,6 +12,7 @@ type ManualStepKey =
   | "notionIntegrationCreated"
   | "notionBasesShared"
   | "googleTestUserAdded"
+  | "templateMessagesPersonalized"
   | "onboardingValidated";
 
 interface StepDef {
@@ -32,6 +33,30 @@ interface PartDef {
 const PARTS: PartDef[] = [
   {
     number: "1",
+    label: "Telegram + Google OAuth",
+    steps: [
+      {
+        key: "googleTestUserAdded",
+        label: "Utilisateur test ajouté sur GCP",
+        description: "L'email du client a été ajouté dans GCP → Écran de consentement OAuth → Audience -> Utilisateurs test. À faire avant la connexion Telegram.",
+        manual: true,
+      },
+      {
+        key: "telegramConnected",
+        label: "Client connecté au bot Alex",
+        description: "Le client a envoyé /start à @Alex_ImmoPilot_bot avec son adresse mail. Telegram Chat ID renseigné automatiquement.",
+        manual: false,
+      },
+      {
+        key: "googleConnected",
+        label: "Google OAuth complété via le bot",
+        description: "Le client a cliqué sur le lien OAuth envoyé par le bot et autorisé l'accès à Gmail + Google Calendar.",
+        manual: false,
+      },
+    ],
+  },
+  {
+    number: "2",
     label: "Notion",
     steps: [
       {
@@ -62,33 +87,9 @@ const PARTS: PartDef[] = [
     ],
   },
   {
-    number: "2",
-    label: "Google Cloud",
-    steps: [
-      {
-        key: "googleTestUserAdded",
-        label: "Utilisateur test ajouté sur GCP",
-        description: "L'email du client a été ajouté dans GCP → Écran de consentement OAuth → Utilisateurs test. À faire avant la connexion Telegram.",
-        manual: true,
-      },
-    ],
-  },
-  {
     number: "3",
-    label: "Telegram + Google OAuth",
+    label: "Google",
     steps: [
-      {
-        key: "telegramConnected",
-        label: "Client connecté au bot Alex",
-        description: "Le client a envoyé /start à @Alex_ImmoPilot_bot avec son adresse mail. Telegram Chat ID renseigné automatiquement.",
-        manual: false,
-      },
-      {
-        key: "googleConnected",
-        label: "Google OAuth complété via le bot",
-        description: "Le client a cliqué sur le lien OAuth envoyé par le bot et autorisé l'accès à Gmail + Google Calendar.",
-        manual: false,
-      },
       {
         key: "gmailLabelsCreated",
         label: "Labels Gmail ImmoPilot créés",
@@ -106,6 +107,12 @@ const PARTS: PartDef[] = [
         label: "Prompt agent mis à jour",
         description: "Le prompt \"Ajouter une tâche\" a été personnalisé dans la config Notion du client.",
         manual: false,
+      },
+      {
+        key: "templateMessagesPersonalized",
+        label: "Config templates messages rempli",
+        description: "Les modèles d'emails ont été renseignés dans la base Config templates messages Notion pour personnaliser les messages envoyés aux leads.",
+        manual: true,
       },
       {
         key: "onboardingValidated",
@@ -235,6 +242,14 @@ export function OnboardingChecklist({ userId, status, onToggle }: Props) {
                       </div>
                       <p className="text-xs text-muted leading-relaxed">{step.description}</p>
 
+                      {step.key === "gmailLabelsCreated" &&
+                        status.steps.googleConnected &&
+                        !isCompleted && (
+                          <div className="mt-2">
+                            <SetupGmailLabelsButton userId={userId} compact />
+                          </div>
+                        )}
+
                       {step.key === "notionDatabasesConnected" && !isCompleted && (
                         <div className="mt-2 space-y-2">
                           <div className="rounded-lg bg-gray-50 border border-line px-3 py-2 text-xs text-gray-600 leading-relaxed">
@@ -293,12 +308,6 @@ export function OnboardingChecklist({ userId, status, onToggle }: Props) {
                 );
               })}
 
-              {/* Bouton Gmail labels — Partie 3, Google connecté mais labels pas encore créés */}
-              {part.number === "3" && status.steps.googleConnected && !status.steps.gmailLabelsCreated && (
-                <div className="pt-3 border-t border-line flex justify-end">
-                  <SetupGmailLabelsButton userId={userId} compact />
-                </div>
-              )}
             </div>
           </div>
         );
